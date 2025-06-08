@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Dashboard{% endblock %}</title>
+
+  <!-- Bootstrap 4 (Dark Navbar + Cards) -->
+  <link
+    rel="stylesheet"
+    href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    crossorigin="anonymous"
+  />
+
+  <!-- Animate.css for subtle animations -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    crossorigin="anonymous"
+  />
+
+  <!-- Font Awesome for icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <!-- Your custom overrides -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}" />
+</head>
+<body class="bg-light">
+
+  <!-- Dark Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand font-weight-bold" href="{{ url_for('main.index') }}">
+        <i class="fas fa-tachometer-alt"></i> NEA Reports Dashboard
+      </a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarMain"
+        aria-controls="navbarMain"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarMain">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item d-flex align-items-center">
+            <!-- Visible offset input for Run All -->
+            <form
+              method="post"
+              action="{{ url_for('main.run_all_tasks') }}"
+              class="form-inline mr-2"
+            >
+              <label for="runAllOffset" class="text-light mb-0 mr-2">Offset:</label>
+              <input
+                type="number"
+                id="runAllOffset"
+                name="offset"
+                class="form-control form-control-sm"
+                style="width: 70px;"
+                value="1"
+                min="1"
+                max="12"
+              />
+            </form>
+
+            <!-- Hidden offset + Run All button -->
+            <form
+              method="post"
+              action="{{ url_for('main.run_all_tasks') }}"
+              class="form-inline"
+            >
+              <input
+                type="hidden"
+                name="offset"
+                id="hiddenRunAllOffset"
+                value="1"
+              />
+              <button type="submit" class="btn btn-danger btn-sm">
+                <i class="fas fa-play-circle"></i> Run All
+              </button>
+            </form>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container my-4">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ msg }}
+            <button
+              type="button"
+              class="close"
+              data-dismiss="alert"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </div>
+
+  <!-- Bootstrap JS + jQuery (for dropdowns, collapse, etc.) -->
+  <script
+    src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"
+    crossorigin="anonymous"
+  ></script>
+
+  <!-- Sync visible offset input with hidden field -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const visibleInput = document.getElementById("runAllOffset");
+      const hiddenInput  = document.getElementById("hiddenRunAllOffset");
+      visibleInput.addEventListener("input", () => {
+        hiddenInput.value = visibleInput.value || 1;
+      });
+    });
+  </script>
+
+  <!-- Your custom JS for card animations, etc. -->
+  <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+# Byte-compiled / cache
+__pycache__/
+*.pyc
+
+# SQLite database
+dashboard.sqlite
+
+# Your local environment file
+.env
+
+# IDE/project files
+.vscode/
+.idea/
+
+# anything else you don’t want checked in

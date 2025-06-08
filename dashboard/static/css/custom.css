@@ -1,0 +1,79 @@
+/* custom.css */
+
+/* Make the page background a light gray */
+body {
+  background-color: #f7f7f7;
+}
+
+/* Start each card invisible and shifted down,
+   then on page-load we add a “visible” class to fade/slide in. */
+.task-card {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  border-radius: 0.5rem;       /* slightly rounded corners */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* subtle shadow */
+  background-color: #ffffff;   /* ensure cards stay white on gray bg */
+}
+.task-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Status badge animations (fade in on success, shake on failure) */
+.badge-success {
+  animation: fadeIn 0.7s ease-in;
+}
+.badge-danger {
+  animation: shakeX 0.7s ease-in;
+}
+
+/* Keyframes for fadeIn */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Keyframes for shakeX (copied from Animate.css) */
+@keyframes shakeX {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* (Optional) Spinning gear for “running” tasks */
+.status-running {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Table row hover */
+.table-hover tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Remove default focus outline on buttons */
+.btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Flash message fade-in */
+.alert {
+  animation: fadeIn 0.5s ease-in;
+}
+
+/* Spacing for inline forms (e.g. offset input + Run Now button) */
+.form-inline input,
+.form-inline select {
+  margin-right: 0.5rem;
+}
+
+/* “Run All” button in navbar (slightly thicker font) */
+.navbar .btn-danger {
+  font-weight: 600;
+}
