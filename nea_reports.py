@@ -11,7 +11,7 @@ import email
 from email.message import EmailMessage
 from datetime import datetime, timedelta
 from decimal import Decimal
-
+from dotenv import load_dotenv
 import pandas as pd
 import xlwings as xw
 from pdf2image import convert_from_path
@@ -19,23 +19,24 @@ from PIL import Image, ImageFilter
 import pytesseract
 
 # ─────────── Configuration ───────────
-SENDER_EMAIL     = "c3enggagent@gmail.com"
-SENDER_PASSWORD  = "zkcd dbel udfu fzhr"
-RECIPIENT_EMAILS = [
-    "edgardoghernaezthe3rd@gmail.com",
-    "radihernaez@gmail.com",
-    "tangarosandra@gmail.com"
-]
-POLL_FOR_REPLY   = True
-POLL_TIMEOUT_MIN = 30
-POLL_INTERVAL_SEC= 10
 
-BASE_NEA         = r"Q:\03. MONTHLY REPORT_EXTERNAL COPY\NEA\NEA Portal"
-BASE_ERC         = r"Q:\03. MONTHLY REPORT_EXTERNAL COPY\ERC\OUTAGES"
+load_dotenv()
+SENDER_EMAIL     = os.environ["SENDER_EMAIL"]
+SENDER_PASSWORD  = os.environ["SENDER_PASSWORD"]
+# split the comma-separated list into a Python list
+RECIPIENT_EMAILS = os.environ["RECIPIENT_EMAILS"].split(",")
 
-PDF_PASSWORD     = "TPC10004"
-JPG_DPI          = 600
-TESSERACT_CMD    = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+# booleans & numbers need casting
+POLL_FOR_REPLY    = os.environ.get("POLL_FOR_REPLY", "True").lower() in ("1","true","yes")
+POLL_TIMEOUT_MIN  = int(os.environ.get("POLL_TIMEOUT_MIN", "30"))
+POLL_INTERVAL_SEC = int(os.environ.get("POLL_INTERVAL_SEC", "10"))
+
+BASE_NEA = os.environ["BASE_NEA"]
+BASE_ERC = os.environ["BASE_ERC"]
+
+PDF_PASSWORD    = os.environ["PDF_PASSWORD"]
+JPG_DPI         = int(os.environ.get("JPG_DPI", "600"))
+TESSERACT_CMD   = os.environ["TESSERACT_CMD"]
 pytesseract.pytesseract.tesseract_cmd = TESSERACT_CMD
 
 # ─────────── Helpers ───────────
