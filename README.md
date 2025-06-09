@@ -32,6 +32,8 @@ External dependencies such as Tesseract OCR, Microsoft Excel and Poppler are als
 ## Usage
 
 1. Copy `.env.example` to `.env` and fill in email credentials and file paths.
+   The application uses `python-dotenv` so these values are automatically loaded
+   when the server starts.
 2. Create the SQLite database and initial tasks:
 
 ```bash
@@ -48,7 +50,9 @@ Visit `http://localhost:5000` to view and run tasks.
 
 ## Security
 
-**Do not commit credentials**. The sample configuration file `config.py` contains plain-text passwords and should be replaced with environment variables.
+**Do not commit credentials.** Store all sensitive values in the `.env` file.
+`config.py` reads from this file on startup so secrets never reside in source
+code.
 
 ## License
 
