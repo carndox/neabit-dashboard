@@ -35,7 +35,7 @@ def task_run_now(task_id):
     except ValueError:
         offset = task.default_offset
 
-    run_task_by_id(task.id, offset=offset)
+    status, message, _ = run_task_by_id(task.id, offset=offset)
     flash(f"“{task.name}” has been queued (offset={offset}).", "success")
     return redirect(url_for("main.task_detail", task_id=task.id))
 
@@ -66,8 +66,10 @@ def task_clear_logs(task_id):
 @main_bp.route("/run_all", methods=["POST"])
 def run_all_tasks():
     """
-    Trigger every enabled task at once by using nea_reports.run_all().
-    Then, if any files were returned, send one consolidated email.
+    Trigger every enabled task sequentially. Each task is executed via
+    ``run_task_by_id`` so individual results are logged in the database.
+    After all tasks finish, send one consolidated email if any files were
+    generated.
     """
     # 1) Determine offset from form
     try:
@@ -77,14 +79,12 @@ def run_all_tasks():
     except ValueError:
         offset = 1
 
-    # 2) Call the combined runner function in nea_reports.py
-    #    run_all(offset) returns a list of all generated file paths
-    try:
-        all_generated_files = run_all(offset)
-    except Exception as e:
-        # If something in run_all() itself blows up, log and flash
-        flash(f"Run All failed: {e}", "danger")
-        return redirect(url_for("main.index"))
+    # 2) Run each enabled task and collect generated file paths
+    all_generated_files = []
+    for task in Task.query.filter_by(enabled=True).order_by(Task.id).all():
+        status, message, files = run_task_by_id(task.id, offset=offset)
+        if files:
+            all_generated_files.extend(files)
 
     # 3) If any files came back, send one email with all attachments
     if all_generated_files:

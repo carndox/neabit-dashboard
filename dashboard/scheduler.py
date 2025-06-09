@@ -21,7 +21,8 @@ def run_task_by_id(task_id: int, offset: int = 1):
     Called by APScheduler or manually via the UI.
     Imports the task’s module + function, runs it with the given offset,
     then writes one TaskLog entry, updates Task.last_run/status,
-    and returns (status, message) so that the caller (views.py) can flash a friendly alert.
+    and returns (status, message, files) so that callers can flash alerts
+    and optionally use the generated file paths.
     """
     task = Task.query.get(task_id)
     if not task or not task.enabled:
@@ -59,7 +60,7 @@ def run_task_by_id(task_id: int, offset: int = 1):
         db.session.add(log)
         db.session.commit()
 
-        return "SUCCESS", user_message
+        return "SUCCESS", user_message, generated_files
 
     except com_error:
         # Excel COM error (e.g. Excel not installed, hung instance)
@@ -80,7 +81,7 @@ def run_task_by_id(task_id: int, offset: int = 1):
         )
         db.session.add(log)
         db.session.commit()
-        return "FAILED", user_message
+        return "FAILED", user_message, []
 
     except FileNotFoundError as fnf:
         # Missing PDF, Excel, or other file
@@ -101,7 +102,7 @@ def run_task_by_id(task_id: int, offset: int = 1):
         )
         db.session.add(log)
         db.session.commit()
-        return "FAILED", user_message
+        return "FAILED", user_message, []
 
     except EmptyDataError:
         # Pandas read_excel or similar found empty/malformed data
@@ -119,7 +120,7 @@ def run_task_by_id(task_id: int, offset: int = 1):
         )
         db.session.add(log)
         db.session.commit()
-        return "FAILED", user_message
+        return "FAILED", user_message, []
 
     except Exception:
         # Catch-all for any other unhandled exception
@@ -140,7 +141,7 @@ def run_task_by_id(task_id: int, offset: int = 1):
         )
         db.session.add(log)
         db.session.commit()
-        return "FAILED", user_message
+        return "FAILED", user_message, []
 
 
 def schedule_all_tasks():
