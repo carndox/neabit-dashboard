@@ -6,8 +6,7 @@ from flask import (
 )
 from dashboard.models import db, Task, TaskLog
 from dashboard.scheduler import run_task_by_id, schedule_all_tasks
-from nea_reports import run_all, send_email, send_simple, wait_reply
-import os
+from nea_reports import run_all, send_email
 
 main_bp = Blueprint("main", __name__)
 
@@ -106,17 +105,6 @@ def run_all_tasks():
                 f"Run All complete—email sent with {len(all_generated_files)} attachments.",
                 "success"
             )
-            if os.environ.get("POLL_FOR_REPLY", "True").lower() in ("1","true","yes"):
-                reply = wait_reply(["yes", "no"])
-                if reply:
-                    if "yes" in reply:
-                        send_simple("Submission Approved", "Proceeding with submission.")
-                        flash("Approval received via email.", "info")
-                    elif "no" in reply:
-                        send_simple("Submission Aborted", "Submission aborted per reply.")
-                        flash("Submission aborted per email reply.", "warning")
-                else:
-                    flash("No approval reply received within timeout.", "secondary")
         except Exception as e:
             flash(f"Email sending failed: {e}", "danger")
     else:

@@ -4,7 +4,6 @@ import importlib
 import os
 import traceback
 from datetime import datetime
-from pytz import timezone
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from pywintypes import com_error
@@ -29,7 +28,7 @@ def run_task_by_id(task_id: int, offset: int = 1):
     if not task or not task.enabled:
         return None, "Task is disabled or does not exist."
 
-    start = datetime.now(timezone(SCHEDULER_TIMEZONE)).replace(tzinfo=None)
+    start = datetime.utcnow()
     try:
         module = importlib.import_module(task.module_path)
         fn     = getattr(module, task.function_name)
