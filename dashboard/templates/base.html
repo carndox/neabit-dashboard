@@ -27,6 +27,12 @@
     referrerpolicy="no-referrer"
   />
 
+  <!-- Google Font -->
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+  />
+
   <!-- Your custom overrides -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}" />
 </head>
@@ -84,7 +90,7 @@
                 id="hiddenRunAllOffset"
                 value="1"
               />
-              <button type="submit" class="btn btn-danger btn-sm">
+              <button type="submit" class="btn btn-danger btn-sm show-progress" data-loading-text="Running all tasks...">
                 <i class="fas fa-play-circle"></i> Run All
               </button>
             </form>
@@ -114,6 +120,15 @@
     {% endwith %}
 
     {% block content %}{% endblock %}
+  </div>
+
+  <!-- Loading overlay for long-running tasks -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner-border text-primary" role="status"></div>
+    <div class="progress w-50 mt-3">
+      <div id="loadingBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"></div>
+    </div>
+    <p id="loadingText" class="mt-3 text-primary font-weight-bold">Processing…</p>
   </div>
 
   <!-- Bootstrap JS + jQuery (for dropdowns, collapse, etc.) -->
