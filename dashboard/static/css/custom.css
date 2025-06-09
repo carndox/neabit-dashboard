@@ -3,6 +3,7 @@
 /* Make the page background a light gray */
 body {
   background-color: #f7f7f7;
+  font-family: 'Roboto', sans-serif;
 }
 
 /* Start each card invisible and shifted down,
@@ -76,4 +77,23 @@ body {
 /* “Run All” button in navbar (slightly thicker font) */
 .navbar .btn-danger {
   font-weight: 600;
+}
+
+/* Full-page loading overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 1050;
+}
+
+.loading-overlay.show {
+  display: flex;
 }
