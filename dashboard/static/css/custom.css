@@ -1,8 +1,9 @@
 /* custom.css */
 
-/* Make the page background a light gray */
+/* Dark theme background */
 body {
-  background-color: #f7f7f7;
+  background-color: #212529;
+  color: #f8f9fa;
 }
 
 /* Start each card invisible and shifted down,
@@ -11,9 +12,9 @@ body {
   opacity: 0;
   transform: translateY(20px);
   transition: opacity 0.5s ease, transform 0.5s ease;
-  border-radius: 0.5rem;       /* slightly rounded corners */
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* subtle shadow */
-  background-color: #ffffff;   /* ensure cards stay white on gray bg */
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  background-color: #343a40;
 }
 .task-card.visible {
   opacity: 1;
@@ -53,7 +54,7 @@ body {
 
 /* Table row hover */
 .table-hover tbody tr:hover {
-  background-color: #f1f1f1;
+  background-color: rgba(255,255,255,0.05);
 }
 
 /* Remove default focus outline on buttons */
@@ -76,4 +77,9 @@ body {
 /* “Run All” button in navbar (slightly thicker font) */
 .navbar .btn-danger {
   font-weight: 600;
+}
+
+#loadingOverlay p {
+  color: #fff;
+  font-size: 1.2rem;
 }
