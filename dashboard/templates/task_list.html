@@ -13,7 +13,7 @@
   <div class="row">
     {% for task in tasks %}
       <div class="col-lg-4 col-md-6 mb-4">
-        <div class="card task-card shadow-sm h-100">
+        <div class="card task-card shadow-sm">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-2">
               <h5 class="card-title mb-0">{{ task.name }}</h5>
@@ -64,14 +64,14 @@
               {% endif %}
             </p>
 
-            <div class="d-flex justify-content-between">
-              <a href="{{ url_for('main.task_detail', task_id=task.id) }}" class="btn btn-outline-primary btn-sm">
-                <i class="fas fa-info-circle"></i> Details
+            <div class="text-right">
+              <a
+                href="{{ url_for('main.task_detail', task_id=task.id) }}"
+                class="btn btn-outline-primary btn-sm"
+              >
+                <i class="fas fa-info-circle"></i>
+                Details
               </a>
-              <form method="post" action="{{ url_for('main.task_run_async', task_id=task.id) }}" class="run-task-form" data-task-id="{{ task.id }}">
-                <input type="hidden" name="offset" value="{{ task.default_offset }}">
-                <button type="submit" class="btn btn-success btn-sm"><i class="fas fa-play"></i></button>
-              </form>
             </div>
           </div>
         </div>

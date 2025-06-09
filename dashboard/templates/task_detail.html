@@ -60,7 +60,7 @@
   <div class="card mb-4">
     <div class="card-body">
       <h5 class="card-title">Run This Task Manually</h5>
-      <form method="post" action="{{ url_for('main.task_run_async', task_id=task.id) }}" class="form-inline run-task-form" data-task-id="{{ task.id }}">
+      <form method="post" action="{{ url_for('main.task_run_now', task_id=task.id) }}" class="form-inline">
         <label for="offsetInput" class="mr-2">Offset (months back):</label>
         <input
           type="number"
