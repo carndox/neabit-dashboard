@@ -8,6 +8,7 @@ This project provides a web based dashboard for orchestrating monthly National E
 * Background scheduling via APScheduler
 * Manual or scheduled execution of five reporting steps
 * Email notifications with optional reply polling
+* Configurable timezone for scheduler and database timestamps
 * Minimal Bootstrap 4 based UI
 
 ## Requirements
@@ -31,9 +32,9 @@ External dependencies such as Tesseract OCR, Microsoft Excel and Poppler are als
 
 ## Usage
 
-1. Copy `.env.example` to `.env` and fill in email credentials and file paths.
-   The application uses `python-dotenv` so these values are automatically loaded
-   when the server starts.
+1. Copy `.env.example` to `.env` and fill in email credentials, file paths and
+   your preferred `APP_TIMEZONE`. The application uses `python-dotenv` so these
+   values are automatically loaded when the server starts.
 2. Create the SQLite database and initial tasks:
 
 ```bash

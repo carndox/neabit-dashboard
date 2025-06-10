@@ -2,6 +2,7 @@
 
 import os
 from dotenv import load_dotenv
+from zoneinfo import ZoneInfo
 
 # Load variables from .env located at project root
 load_dotenv()
@@ -25,4 +26,8 @@ SQLALCHEMY_DATABASE_URI = os.environ.get(
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 # — APScheduler timezone —
-SCHEDULER_TIMEZONE = os.environ.get("SCHEDULER_TIMEZONE", "Asia/Manila")
+APP_TIMEZONE_STR = os.environ.get("APP_TIMEZONE", "Asia/Manila")
+APP_TIMEZONE = ZoneInfo(APP_TIMEZONE_STR)
+
+# Scheduler defaults to the same timezone
+SCHEDULER_TIMEZONE = os.environ.get("SCHEDULER_TIMEZONE", APP_TIMEZONE_STR)

@@ -9,6 +9,7 @@ import ssl
 import imaplib
 import email
 from email.message import EmailMessage
+from email.utils import make_msgid
 from datetime import datetime, timedelta
 from decimal import Decimal
 from dotenv import load_dotenv
@@ -58,14 +59,20 @@ def month_folder(d: datetime) -> str:
     """Format a folder name as 'MM. MON YYYY' for the given date 'd'."""
     return f"{d.month:02d}. {d.strftime('%b').upper()} {d.year}"
 
-def send_email(subject: str, body: str, paths: list[str]) -> None:
+def send_email(subject: str, body: str, paths: list[str], reply_to_msgid: str | None = None) -> str:
     """
-    Send an email with the given subject, body, and list of file paths as attachments.
+    Send an email with the given subject, body, and attachments.
+    Returns the Message-ID so callers can reply in-thread.
     """
     msg = EmailMessage()
     msg["From"]    = SENDER_EMAIL
     msg["To"]      = ", ".join(RECIPIENT_EMAILS)
     msg["Subject"] = subject
+    if reply_to_msgid:
+        msg["In-Reply-To"] = reply_to_msgid
+        msg["References"] = reply_to_msgid
+    msg_id = make_msgid()
+    msg["Message-ID"] = msg_id
     msg.set_content(body)
     for p in paths:
         mime, _ = mimetypes.guess_type(p)
@@ -81,20 +88,28 @@ def send_email(subject: str, body: str, paths: list[str]) -> None:
     with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ctx) as s:
         s.login(SENDER_EMAIL, SENDER_PASSWORD)
         s.send_message(msg)
+    return msg_id
 
-def send_simple(subject: str, body: str) -> None:
+def send_simple(subject: str, body: str, reply_to_msgid: str | None = None) -> str:
     """
-    Send a simple email (no attachments) with given subject and body.
+    Send a simple email with the given subject and body.
+    Returns the Message-ID so callers can thread replies.
     """
     msg = EmailMessage()
     msg["From"]    = SENDER_EMAIL
     msg["To"]      = ", ".join(RECIPIENT_EMAILS)
     msg["Subject"] = subject
+    if reply_to_msgid:
+        msg["In-Reply-To"] = reply_to_msgid
+        msg["References"] = reply_to_msgid
+    msg_id = make_msgid()
+    msg["Message-ID"] = msg_id
     msg.set_content(body)
     ctx = ssl.create_default_context()
     with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ctx) as s:
         s.login(SENDER_EMAIL, SENDER_PASSWORD)
         s.send_message(msg)
+    return msg_id
 
 def wait_reply(keywords: list[str]) -> str | None:
     """

@@ -4,6 +4,7 @@ import importlib
 import os
 import traceback
 from datetime import datetime
+from config import SCHEDULER_TIMEZONE, APP_TIMEZONE
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from pywintypes import com_error
@@ -11,8 +12,6 @@ from pandas.errors import EmptyDataError
 
 from flask import current_app
 from dashboard.models import db, Task, TaskLog
-from config import SCHEDULER_TIMEZONE
-
 sched = BackgroundScheduler(timezone=SCHEDULER_TIMEZONE)
 
 
@@ -28,7 +27,7 @@ def run_task_by_id(task_id: int, offset: int = 1):
     if not task or not task.enabled:
         return None, "Task is disabled or does not exist."
 
-    start = datetime.utcnow()
+    start = datetime.now(APP_TIMEZONE).replace(tzinfo=None)
     try:
         module = importlib.import_module(task.module_path)
         fn     = getattr(module, task.function_name)

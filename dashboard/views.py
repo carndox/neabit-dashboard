@@ -6,7 +6,7 @@ from flask import (
 )
 from dashboard.models import db, Task, TaskLog
 from dashboard.scheduler import run_task_by_id, schedule_all_tasks
-from nea_reports import run_all, send_email
+from nea_reports import run_all, send_email, send_simple, wait_reply, POLL_FOR_REPLY
 
 main_bp = Blueprint("main", __name__)
 
@@ -90,8 +90,9 @@ def run_all_tasks():
     if all_generated_files:
         # Build subject/body exactly as you did in your original script
         from datetime import datetime, timedelta
+        from config import APP_TIMEZONE
 
-        d = datetime.today().replace(day=1) - timedelta(days=1)
+        d = datetime.now(APP_TIMEZONE).replace(day=1) - timedelta(days=1)
         mmyy = d.strftime("%B %Y")
         subject = f"Monthly NEA Reports – {mmyy}"
         body = (
@@ -100,11 +101,17 @@ def run_all_tasks():
         )
 
         try:
-            send_email(subject, body, all_generated_files)
+            msgid = send_email(subject, body, all_generated_files)
             flash(
                 f"Run All complete—email sent with {len(all_generated_files)} attachments.",
                 "success"
             )
+            if POLL_FOR_REPLY and wait_reply(["yes", "approved", "proceed"]):
+                send_simple(
+                    f"Re: {subject}",
+                    "Approval received. Proceeding with submission of the files.",
+                    reply_to_msgid=msgid,
+                )
         except Exception as e:
             flash(f"Email sending failed: {e}", "danger")
     else:
