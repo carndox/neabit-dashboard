@@ -30,7 +30,8 @@ RECIPIENT_EMAILS = os.environ["RECIPIENT_EMAILS"].split(",")
 # booleans & numbers need casting
 POLL_FOR_REPLY    = os.environ.get("POLL_FOR_REPLY", "True").lower() in ("1","true","yes")
 POLL_TIMEOUT_MIN  = int(os.environ.get("POLL_TIMEOUT_MIN", "30"))
-POLL_INTERVAL_SEC = int(os.environ.get("POLL_INTERVAL_SEC", "10"))
+# Poll interval defaults to 5 seconds
+POLL_INTERVAL_SEC = int(os.environ.get("POLL_INTERVAL_SEC", "5"))
 
 BASE_NEA = os.environ["BASE_NEA"]
 BASE_ERC = os.environ["BASE_ERC"]
@@ -64,6 +65,7 @@ def send_email(subject: str, body: str, paths: list[str], reply_to_msgid: str | 
     Send an email with the given subject, body, and attachments.
     Returns the Message-ID so callers can reply in-thread.
     """
+    print(f"Sending email '{subject}' to {RECIPIENT_EMAILS}")
     msg = EmailMessage()
     msg["From"]    = SENDER_EMAIL
     msg["To"]      = ", ".join(RECIPIENT_EMAILS)
@@ -95,6 +97,7 @@ def send_simple(subject: str, body: str, reply_to_msgid: str | None = None) -> s
     Send a simple email with the given subject and body.
     Returns the Message-ID so callers can thread replies.
     """
+    print(f"Sending email '{subject}'")
     msg = EmailMessage()
     msg["From"]    = SENDER_EMAIL
     msg["To"]      = ", ".join(RECIPIENT_EMAILS)
@@ -111,16 +114,18 @@ def send_simple(subject: str, body: str, reply_to_msgid: str | None = None) -> s
         s.send_message(msg)
     return msg_id
 
-def wait_reply(keywords: list[str]) -> str | None:
+def wait_reply(pos_keywords: list[str], neg_keywords: list[str] | None = None) -> str | None:
     """
-    Poll the inbox for replies that contain one of the specified keywords 
-    (case-insensitive). Return the matching subject/text if found within 
-    the timeout, or None if timed out.
+    Poll the inbox indefinitely until a reply contains one of the
+    ``pos_keywords`` or ``neg_keywords`` (case-insensitive).
+    Returns ``"yes"`` if a positive keyword is found or ``"no"`` for a
+    negative keyword.
     """
-    end = time.time() + POLL_TIMEOUT_MIN * 60
-    keys = set(k.lower() for k in keywords)
+    yes_keys = set(k.lower() for k in pos_keywords)
+    no_keys = set(k.lower() for k in (neg_keywords or []))
     whitelist = set(e.lower() for e in RECIPIENT_EMAILS)
-    while time.time() < end:
+    print("Waiting for email reply...")
+    while True:
         with imaplib.IMAP4_SSL("imap.gmail.com") as imap:
             imap.login(SENDER_EMAIL, SENDER_PASSWORD)
             imap.select("INBOX")
@@ -140,12 +145,17 @@ def wait_reply(keywords: list[str]) -> str | None:
                 else:
                     txt += " " + m.get_payload(decode=True).decode(errors="ignore")
                 words = set(w.strip(".,!?;:()[]\"'") for w in txt.lower().split())
-                if words & keys:
+                if words & yes_keys:
+                    print("Positive reply received:", txt)
                     imap.logout()
-                    return txt.lower()
+                    return "yes"
+                if no_keys and (words & no_keys):
+                    print("Negative reply received:", txt)
+                    imap.logout()
+                    return "no"
             imap.logout()
+        print(f"No matching reply; checking again in {POLL_INTERVAL_SEC} seconds")
         time.sleep(POLL_INTERVAL_SEC)
-    return None
 
 # ─────────── Report Steps (Task Functions) ───────────
 

@@ -106,12 +106,23 @@ def run_all_tasks():
                 f"Run All complete—email sent with {len(all_generated_files)} attachments.",
                 "success"
             )
-            if POLL_FOR_REPLY and wait_reply(["yes", "approved", "proceed"]):
-                send_simple(
-                    f"Re: {subject}",
-                    "Approval received. Proceeding with submission of the files.",
-                    reply_to_msgid=msgid,
+            if POLL_FOR_REPLY:
+                result = wait_reply(
+                    ["yes", "approved", "proceed", "go", "go ahead"],
+                    ["no", "abort", "cancel", "stop"],
                 )
+                if result == "yes":
+                    send_simple(
+                        f"Re: {subject}",
+                        "Approval received. Proceeding with submission of the files.",
+                        reply_to_msgid=msgid,
+                    )
+                elif result == "no":
+                    send_simple(
+                        f"Re: {subject}",
+                        "Process aborted per reply.",
+                        reply_to_msgid=msgid,
+                    )
         except Exception as e:
             flash(f"Email sending failed: {e}", "danger")
     else:
