@@ -114,12 +114,22 @@ def send_simple(subject: str, body: str, reply_to_msgid: str | None = None) -> s
         s.send_message(msg)
     return msg_id
 
-def wait_reply(pos_keywords: list[str], neg_keywords: list[str] | None = None) -> str | None:
+def wait_reply(
+    pos_keywords: list[str],
+    neg_keywords: list[str] | None = None,
+    *,
+    after: datetime | None = None,
+    thread_msgid: str | None = None,
+) -> str | None:
     """
     Poll the inbox indefinitely until a reply contains one of the
     ``pos_keywords`` or ``neg_keywords`` (case-insensitive).
-    Returns ``"yes"`` if a positive keyword is found or ``"no"`` for a
-    negative keyword.
+    
+    If ``after`` is provided, only emails received after this timestamp
+    are considered. If ``thread_msgid`` is provided, only messages whose
+    ``In-Reply-To`` or ``References`` header contains that value are
+    checked. Returns ``"yes"`` for a positive match or ``"no`` for a
+    negative one.
     """
     yes_keys = set(k.lower() for k in pos_keywords)
     no_keys = set(k.lower() for k in (neg_keywords or []))
@@ -137,6 +147,20 @@ def wait_reply(pos_keywords: list[str], neg_keywords: list[str] | None = None) -
                 imap.store(num, "+FLAGS", "\\Seen")
                 if frm not in whitelist:
                     continue
+                # Skip messages not matching thread or timestamp
+                if thread_msgid:
+                    refs = " ".join(
+                        filter(None, [m.get("In-Reply-To"), m.get("References")])
+                    )
+                    if thread_msgid not in refs:
+                        continue
+                if after:
+                    try:
+                        msg_dt = email.utils.parsedate_to_datetime(m["Date"])
+                        if msg_dt <= after.astimezone(msg_dt.tzinfo):
+                            continue
+                    except Exception:
+                        pass
                 txt = m.get("Subject", "")
                 if m.is_multipart():
                     for part in m.walk():

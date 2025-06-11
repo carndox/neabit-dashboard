@@ -8,6 +8,7 @@ This project provides a web based dashboard for orchestrating monthly National E
 * Background scheduling via APScheduler
 * Manual or scheduled execution of five reporting steps
 * Email notifications with optional reply polling
+  that filters out old or unrelated emails
 * Configurable timezone for scheduler and database timestamps
 * Minimal Bootstrap 4 based UI
 

@@ -101,6 +101,7 @@ def run_all_tasks():
         )
 
         try:
+            send_time = datetime.now(APP_TIMEZONE)
             msgid = send_email(subject, body, all_generated_files)
             flash(
                 f"Run All complete—email sent with {len(all_generated_files)} attachments.",
@@ -110,6 +111,8 @@ def run_all_tasks():
                 result = wait_reply(
                     ["yes", "approved", "proceed", "go", "go ahead"],
                     ["no", "abort", "cancel", "stop"],
+                    after=send_time,
+                    thread_msgid=msgid,
                 )
                 if result == "yes":
                     send_simple(
