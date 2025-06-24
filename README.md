@@ -10,7 +10,8 @@ This project provides a web based dashboard for orchestrating monthly National E
 * Email notifications with optional reply polling
   that filters out old or unrelated emails
 * Configurable timezone for scheduler and database timestamps
-* Minimal Bootstrap 4 based UI
+* Modern Bootswatch 5 based UI with optional dark mode
+* Simple JSON API for integrations
 
 ## Requirements
 

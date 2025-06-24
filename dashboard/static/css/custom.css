@@ -1,8 +1,17 @@
 /* custom.css */
 
-/* Make the page background a light gray */
+:root {
+  --bg-color: #f7f7f7;
+  --card-bg: #ffffff;
+}
+
+[data-theme="dark"] {
+  --bg-color: #181818;
+  --card-bg: #2b2b2b;
+}
+
 body {
-  background-color: #f7f7f7;
+  background-color: var(--bg-color);
 }
 
 /* Start each card invisible and shifted down,
@@ -13,7 +22,7 @@ body {
   transition: opacity 0.5s ease, transform 0.5s ease;
   border-radius: 0.5rem;       /* slightly rounded corners */
   box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* subtle shadow */
-  background-color: #ffffff;   /* ensure cards stay white on gray bg */
+  background-color: var(--card-bg);
 }
 .task-card.visible {
   opacity: 1;
